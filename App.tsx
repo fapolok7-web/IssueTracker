@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import IssueEntry from './components/IssueEntry';
@@ -9,29 +10,26 @@ import MonthlyReports from './components/MonthlyReports';
 import DowntimeEntry from './components/DowntimeEntry';
 import DowntimeReports from './components/DowntimeReports';
 import Settings from './components/Settings';
-import { ViewType } from './types';
+
 
 const App: React.FC = () => {
-  const [activeView, setActiveView] = useState<ViewType>('Dashboard');
-
-  const renderView = () => {
-    switch (activeView) {
-      case 'Dashboard': return <Dashboard />;
-      case 'IssueEntry': return <IssueEntry />;
-      case 'IssueReports': return <IssueReports />;
-      case 'MonthlyEntry': return <MonthlyEntry />;
-      case 'MonthlyReports': return <MonthlyReports />;
-      case 'DowntimeEntry': return <DowntimeEntry />;
-      case 'DowntimeReports': return <DowntimeReports />;
-      case 'Settings': return <Settings />;
-      default: return <Dashboard />;
-    }
-  };
-
   return (
-    <Layout activeView={activeView} onNavigate={setActiveView}>
-      {renderView()}
-    </Layout>
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/issue-entry" element={<IssueEntry />} />
+          <Route path="/issue-reports" element={<IssueReports />} />
+          <Route path="/monthly-entry" element={<MonthlyEntry />} />
+          <Route path="/monthly-reports" element={<MonthlyReports />} />
+          <Route path="/downtime-entry" element={<DowntimeEntry />} />
+          <Route path="/downtime-reports" element={<DowntimeReports />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Layout>
+    </Router>
   );
 };
 
