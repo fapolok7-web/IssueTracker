@@ -31,7 +31,6 @@ const Dashboard: React.FC = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
   const [frequentPage, setFrequentPage] = useState(1);
@@ -142,23 +141,6 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <span className="text-xs font-bold text-slate-400 pl-2 uppercase">Year</span>
-            <select
-              value={selectedYear}
-              onChange={(e) => {
-                const year = Number(e.target.value);
-                setSelectedYear(year);
-                // Update selectedMonth to keep the same month but the new year
-                const month = selectedMonth.split('-')[1];
-                setSelectedMonth(`${year}-${month}`);
-              }}
-              className="bg-transparent text-sm font-semibold outline-none pr-2 cursor-pointer text-indigo-600"
-            >
-              {[2024, 2025, 2026, 2027].map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-
             <span className="text-xs font-bold text-slate-400 uppercase">Select Month</span>
             <select
               value={selectedMonth}
@@ -166,9 +148,10 @@ const Dashboard: React.FC = () => {
               className="bg-transparent text-sm font-semibold outline-none pr-2 cursor-pointer text-indigo-600"
             >
               {Array.from({ length: 12 }, (_, i) => {
+                const currentYear = new Date().getFullYear();
                 const month = String(i + 1).padStart(2, '0');
-                const val = `${selectedYear}-${month}`;
-                const date = new Date(selectedYear, i, 1);
+                const val = `${currentYear}-${month}`;
+                const date = new Date(currentYear, i, 1);
                 const isFuture = date > new Date();
 
                 return (
