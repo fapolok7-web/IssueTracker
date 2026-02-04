@@ -16,7 +16,8 @@ import {
   ArrowDownRight,
   ChevronDown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import { Issue, MonthlyEntry, SystemDowntime } from '../types';
@@ -30,6 +31,7 @@ const Dashboard: React.FC = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
   const [frequentPage, setFrequentPage] = useState(1);
@@ -122,7 +124,8 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <span className="text-xs font-bold text-slate-400 pl-2 uppercase">From</span>
+            <Calendar size={16} className="text-indigo-600 dark:text-white ml-2" />
+            <span className="text-xs font-bold text-slate-400 uppercase">From</span>
             <input
               type="date"
               value={fromDate}
@@ -139,7 +142,24 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <span className="text-xs font-bold text-slate-400 pl-2 uppercase">Select Month</span>
+            <span className="text-xs font-bold text-slate-400 pl-2 uppercase">Year</span>
+            <select
+              value={selectedYear}
+              onChange={(e) => {
+                const year = Number(e.target.value);
+                setSelectedYear(year);
+                // Update selectedMonth to keep the same month but the new year
+                const month = selectedMonth.split('-')[1];
+                setSelectedMonth(`${year}-${month}`);
+              }}
+              className="bg-transparent text-sm font-semibold outline-none pr-2 cursor-pointer text-indigo-600"
+            >
+              {[2024, 2025, 2026, 2027].map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+
+            <span className="text-xs font-bold text-slate-400 uppercase">Select Month</span>
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
@@ -147,13 +167,13 @@ const Dashboard: React.FC = () => {
             >
               {Array.from({ length: 12 }, (_, i) => {
                 const month = String(i + 1).padStart(2, '0');
-                const val = `2026-${month}`;
-                const date = new Date(2026, i, 1);
+                const val = `${selectedYear}-${month}`;
+                const date = new Date(selectedYear, i, 1);
                 const isFuture = date > new Date();
 
                 return (
                   <option key={val} value={val} disabled={isFuture}>
-                    {date.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                    {date.toLocaleString('default', { month: 'long' })}
                   </option>
                 );
               })}
