@@ -9,7 +9,6 @@ import MonthlyEntry from './components/MonthlyEntry';
 import MonthlyReports from './components/MonthlyReports';
 import DowntimeEntry from './components/DowntimeEntry';
 import DowntimeReports from './components/DowntimeReports';
-import UptimeMonitoring from './components/UptimeMonitoring';
 import Settings from './components/Settings';
 
 
@@ -22,7 +21,6 @@ const App: React.FC = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/issue-entry" element={<IssueEntry />} />
           <Route path="/issue-reports" element={<IssueReports />} />
-          <Route path="/uptime-monitoring" element={<UptimeMonitoring />} />
           <Route path="/monthly-entry" element={<MonthlyEntry />} />
           <Route path="/monthly-reports" element={<MonthlyReports />} />
           <Route path="/downtime-entry" element={<DowntimeEntry />} />
