@@ -119,6 +119,15 @@ const UptimeMonitoring: React.FC = () => {
         : 0;
     const incidentCount = logs.filter(l => l.incident_state === 'NEW INCIDENT').length;
 
+    const handleToggleMonitoring = () => {
+        const nextState = !isMonitoring;
+        setIsMonitoring(nextState);
+        if (nextState) {
+            // Trigger first check immediately instead of waiting 30s
+            performCheck();
+        }
+    };
+
     const chartData = [...logs].reverse().map(l => ({
         time: new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         latency: l.response_time_ms || 0,
@@ -160,10 +169,10 @@ const UptimeMonitoring: React.FC = () => {
                         </div>
 
                         <button
-                            onClick={() => setIsMonitoring(!isMonitoring)}
+                            onClick={handleToggleMonitoring}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all active:scale-95 ${isMonitoring
-                                    ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20'
-                                    : 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:bg-emerald-600'
+                                ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20'
+                                : 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:bg-emerald-600'
                                 }`}
                         >
                             {isMonitoring ? <Square size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}
@@ -327,8 +336,8 @@ const UptimeMonitoring: React.FC = () => {
                                     <div key={idx} className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl space-y-2">
                                         <div className="flex justify-between items-start">
                                             <span className={`text-[10px] font-black uppercase tracking-widest ${log.incident_state === 'RECOVERED' ? 'text-emerald-500' :
-                                                    log.incident_state === 'NEW INCIDENT' ? 'text-rose-500' :
-                                                        'text-slate-500'
+                                                log.incident_state === 'NEW INCIDENT' ? 'text-rose-500' :
+                                                    'text-slate-500'
                                                 }`}>
                                                 {log.incident_state === 'NONE' ? 'CHECK' : log.incident_state}
                                             </span>

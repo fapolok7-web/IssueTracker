@@ -5,6 +5,8 @@ ALTER TABLE settings DISABLE ROW LEVEL SECURITY;
 ALTER TABLE issues DISABLE ROW LEVEL SECURITY;
 ALTER TABLE monthly_entries DISABLE ROW LEVEL SECURITY;
 ALTER TABLE system_downtime DISABLE ROW LEVEL SECURITY;
+ALTER TABLE uptime_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE uptime_logs DISABLE ROW LEVEL SECURITY;
 
 -- If you prefer keeping RLS enabled but want to allow public access, 
 -- you can alternatively run these policies (OPTIONAL - DO NOT RUN IF YOU RAN DISABLE ABOVE):
