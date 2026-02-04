@@ -78,6 +78,35 @@ insert into settings (category, name)
 select 'status', 'Open'
 where not exists (select 1 from settings where category = 'status');
 
-insert into settings (category, name)
+insert into settings (assigned_person, name)
 select 'assigned_person', 'Fuad'
 where not exists (select 1 from settings where category = 'assigned_person');
+
+-- Uptime Settings Table
+create table if not exists uptime_settings (
+  id uuid default uuid_generate_v4() primary key,
+  target_url text not null default 'https://hrm.tipsoi.pro',
+  check_interval_seconds integer not null default 30,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Uptime Logs Table
+create table if not exists uptime_logs (
+  id uuid default uuid_generate_v4() primary key,
+  timestamp timestamp with time zone default timezone('utc'::text, now()) not null,
+  http_status integer,
+  response_time_ms integer,
+  success boolean not null,
+  error_message text,
+  status text not null, -- UP | DOWN
+  incident_state text not null, -- NONE | NEW INCIDENT | ONGOING INCIDENT | RECOVERED
+  alert_required boolean default false,
+  recovery_notice boolean default false,
+  message text,
+  summary text
+);
+
+-- Insert initial uptime setting
+insert into uptime_settings (target_url, check_interval_seconds)
+select 'https://hrm.tipsoi.pro', 30
+where not exists (select 1 from uptime_settings);

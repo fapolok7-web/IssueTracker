@@ -44,6 +44,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { type: 'divider', label: 'Issues' },
     { path: '/issue-entry', icon: PlusCircle, label: 'Issue Entry' },
     { path: '/issue-reports', icon: FileText, label: 'Issue Reports' },
+    { type: 'divider', label: 'Monitoring' },
+    { path: '/uptime-monitoring', icon: ShieldCheck, label: 'Uptime Monitoring' },
     { type: 'divider', label: 'Monthly Tracking' },
     { path: '/monthly-entry', icon: Calendar, label: 'Monthly Entry' },
     { path: '/monthly-reports', icon: BarChart3, label: 'Monthly Reports' },

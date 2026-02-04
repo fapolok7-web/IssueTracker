@@ -45,12 +45,35 @@ export interface SystemDowntime {
   created_at: string;
 }
 
+export interface UptimeSettings {
+  id: string;
+  target_url: string;
+  check_interval_seconds: number;
+  updated_at: string;
+}
+
+export interface UptimeLog {
+  id: string;
+  timestamp: string;
+  http_status: number | null;
+  response_time_ms: number | null;
+  success: boolean;
+  error_message: string | null;
+  status: 'UP' | 'DOWN';
+  incident_state: 'NONE' | 'NEW INCIDENT' | 'ONGOING INCIDENT' | 'RECOVERED';
+  alert_required: boolean;
+  recovery_notice: boolean;
+  message: string;
+  summary: string;
+}
+
 export type ViewType =
   | 'Dashboard'
   | 'IssueEntry'
   | 'IssueReports'
   | 'MonthlyEntry'
   | 'MonthlyReports'
+  | 'UptimeMonitoring'
   | 'DowntimeEntry'
   | 'DowntimeReports'
   | 'Settings';
