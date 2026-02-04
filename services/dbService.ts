@@ -1,19 +1,7 @@
-
+import { supabase } from '../supabaseClient';
 import { Issue, MonthlyEntry, SystemDowntime, SettingItem } from '../types';
 
-// This service is built to be easily replaced with Supabase calls.
-// For the purpose of this functional demo, it uses localStorage to ensure it works out of the box.
-
-const getStored = <T,>(key: string): T[] => {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
-};
-
-const setStored = <T,>(key: string, data: T[]): void => {
-  localStorage.setItem(key, JSON.stringify(data));
-};
-
-// Default initial settings
+// Default initial settings to seed if database is empty
 const INITIAL_SETTINGS: Omit<SettingItem, 'id' | 'created_at'>[] = [
   { category: 'issue_type', name: 'Software' },
   { category: 'issue_type', name: 'Device' },
@@ -40,117 +28,154 @@ const INITIAL_SETTINGS: Omit<SettingItem, 'id' | 'created_at'>[] = [
 export const dbService = {
   // Settings
   async getSettings(): Promise<SettingItem[]> {
-    let settings = getStored<SettingItem>('settings');
-    if (settings.length === 0) {
-      settings = INITIAL_SETTINGS.map(s => ({
-        ...s,
-        id: Math.random().toString(36).substr(2, 9),
-        created_at: new Date().toISOString()
-      }));
-      setStored('settings', settings);
-    }
-    return settings;
+    const { data, error } = await supabase
+      .from('settings')
+      .select('*');
+    if (error) throw error;
+    return data || [];
   },
+
   async getSettingsByCategory(category: SettingItem['category']): Promise<SettingItem[]> {
-    const settings = await this.getSettings();
-    return settings.filter(s => s.category === category);
+    const { data, error } = await supabase
+      .from('settings')
+      .select('*')
+      .eq('category', category);
+    if (error) throw error;
+    return data || [];
   },
+
   async saveSetting(setting: Omit<SettingItem, 'id' | 'created_at'>): Promise<SettingItem> {
-    const settings = getStored<SettingItem>('settings');
-    const newSetting: SettingItem = {
-      ...setting,
-      id: Math.random().toString(36).substr(2, 9),
-      created_at: new Date().toISOString()
-    };
-    setStored('settings', [...settings, newSetting]);
-    return newSetting;
+    const { data, error } = await supabase
+      .from('settings')
+      .insert([setting])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
+
   async updateSetting(id: string, name: string): Promise<SettingItem> {
-    const settings = getStored<SettingItem>('settings');
-    const index = settings.findIndex(s => s.id === id);
-    if (index === -1) throw new Error('Setting not found');
-    const updated = { ...settings[index], name };
-    settings[index] = updated;
-    setStored('settings', settings);
-    return updated;
+    const { data, error } = await supabase
+      .from('settings')
+      .update({ name })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
+
   async deleteSetting(id: string): Promise<void> {
-    const settings = getStored<SettingItem>('settings');
-    setStored('settings', settings.filter(s => s.id !== id));
+    const { error } = await supabase
+      .from('settings')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   },
 
   // Issues
   async getIssues(): Promise<Issue[]> {
-    return getStored<Issue>('issues');
+    const { data, error } = await supabase
+      .from('issues')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
   },
+
   async saveIssue(issue: Omit<Issue, 'id' | 'created_at' | 'updated_at'>): Promise<Issue> {
-    const issues = getStored<Issue>('issues');
-    const newIssue: Issue = {
-      ...issue,
-      id: Math.random().toString(36).substr(2, 9),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    setStored('issues', [newIssue, ...issues]);
-    return newIssue;
+    const { data, error } = await supabase
+      .from('issues')
+      .insert([issue])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
+
   async updateIssue(id: string, updates: Partial<Issue>): Promise<Issue> {
-    const issues = getStored<Issue>('issues');
-    const index = issues.findIndex(i => i.id === id);
-    if (index === -1) throw new Error('Issue not found');
-    const updated = { ...issues[index], ...updates, updated_at: new Date().toISOString() };
-    issues[index] = updated;
-    setStored('issues', issues);
-    return updated;
+    const { data, error } = await supabase
+      .from('issues')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
+
   async deleteIssue(id: string): Promise<void> {
-    const issues = getStored<Issue>('issues');
-    setStored('issues', issues.filter(i => i.id !== id));
+    const { error } = await supabase
+      .from('issues')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   },
 
   // Monthly Entries
   async getMonthlyEntries(): Promise<MonthlyEntry[]> {
-    return getStored<MonthlyEntry>('monthly_entries');
+    const { data, error } = await supabase
+      .from('monthly_entries')
+      .select('*')
+      .order('month', { ascending: false });
+    if (error) throw error;
+    return data || [];
   },
+
   async saveMonthlyEntry(entry: Omit<MonthlyEntry, 'id' | 'created_at'>): Promise<MonthlyEntry> {
-    const entries = getStored<MonthlyEntry>('monthly_entries');
-    const newEntry: MonthlyEntry = {
-      ...entry,
-      id: Math.random().toString(36).substr(2, 9),
-      created_at: new Date().toISOString(),
-    };
-    setStored('monthly_entries', [newEntry, ...entries]);
-    return newEntry;
+    const { data, error } = await supabase
+      .from('monthly_entries')
+      .insert([entry])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
+
   async updateMonthlyEntry(id: string, updates: Partial<MonthlyEntry>): Promise<MonthlyEntry> {
-    const entries = getStored<MonthlyEntry>('monthly_entries');
-    const index = entries.findIndex(e => e.id === id);
-    const updated = { ...entries[index], ...updates };
-    entries[index] = updated;
-    setStored('monthly_entries', entries);
-    return updated;
+    const { data, error } = await supabase
+      .from('monthly_entries')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
+
   async deleteMonthlyEntry(id: string): Promise<void> {
-    const entries = getStored<MonthlyEntry>('monthly_entries');
-    setStored('monthly_entries', entries.filter(e => e.id !== id));
+    const { error } = await supabase
+      .from('monthly_entries')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   },
 
   // System Downtime
   async getDowntime(): Promise<SystemDowntime[]> {
-    return getStored<SystemDowntime>('system_downtime');
+    const { data, error } = await supabase
+      .from('system_downtime')
+      .select('*')
+      .order('date', { ascending: false });
+    if (error) throw error;
+    return data || [];
   },
+
   async saveDowntime(entry: Omit<SystemDowntime, 'id' | 'created_at'>): Promise<SystemDowntime> {
-    const data = getStored<SystemDowntime>('system_downtime');
-    const newEntry: SystemDowntime = {
-      ...entry,
-      id: Math.random().toString(36).substr(2, 9),
-      created_at: new Date().toISOString(),
-    };
-    setStored('system_downtime', [newEntry, ...data]);
-    return newEntry;
+    const { data, error } = await supabase
+      .from('system_downtime')
+      .insert([entry])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
+
   async deleteDowntime(id: string): Promise<void> {
-    const data = getStored<SystemDowntime>('system_downtime');
-    setStored('system_downtime', data.filter(d => d.id !== id));
+    const { error } = await supabase
+      .from('system_downtime')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   }
 };
