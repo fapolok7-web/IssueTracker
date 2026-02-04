@@ -54,10 +54,10 @@ const Dashboard: React.FC = () => {
   // Metrics
   const stats = [
     { label: 'Total Issues', value: (currentMonthlyEntry?.total_issues || 0) + filteredIssues.length, icon: AlertCircle, color: 'text-indigo-600', bg: 'bg-indigo-100 dark:bg-indigo-900/20' },
-    { label: 'System bugs', value: (currentMonthlyEntry?.system_bugs || 0) + filteredIssues.filter(i => i.issue_type === 'Software').length, icon: Bug, color: 'text-rose-600', bg: 'bg-rose-100 dark:bg-rose-900/20' },
+    { label: 'System Bugs', value: (currentMonthlyEntry?.system_bugs || 0) + filteredIssues.filter(i => i.issue_type === 'System Bugs').length, icon: Bug, color: 'text-rose-600', bg: 'bg-rose-100 dark:bg-rose-900/20' },
     { label: 'Device Issues', value: (currentMonthlyEntry?.device_issues || 0) + filteredIssues.filter(i => i.issue_type === 'Device').length, icon: Smartphone, color: 'text-amber-600', bg: 'bg-amber-100 dark:bg-amber-900/20' },
-    { label: 'Awareness', value: (currentMonthlyEntry?.awareness || 0) + filteredIssues.filter(i => i.issue_type === 'Awareness').length, icon: Lightbulb, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/20' },
-    { label: 'Help requests', value: (currentMonthlyEntry?.help_requests || 0) + filteredIssues.filter(i => i.issue_type === 'Help Request').length, icon: HelpCircle, color: 'text-sky-600', bg: 'bg-sky-100 dark:bg-sky-900/20' },
+    { label: 'Awerness', value: (currentMonthlyEntry?.awareness || 0) + filteredIssues.filter(i => i.issue_type === 'Awerness').length, icon: Lightbulb, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/20' },
+    { label: 'Help Request', value: (currentMonthlyEntry?.help_requests || 0) + filteredIssues.filter(i => i.issue_type === 'Help Request').length, icon: HelpCircle, color: 'text-sky-600', bg: 'bg-sky-100 dark:bg-sky-900/20' },
     { label: 'System Downtime', value: `${(downtime.filter(d => d.date.startsWith(selectedMonth)).reduce((acc, d) => acc + d.duration_minutes, 0) / 60).toFixed(1)}h`, icon: Activity, color: 'text-fuchsia-600', bg: 'bg-fuchsia-100 dark:bg-fuchsia-900/20' },
   ];
 
@@ -74,10 +74,10 @@ const Dashboard: React.FC = () => {
 
   // Chart Data
   const issueTypeData = [
-    { name: 'System bugs', value: (currentMonthlyEntry?.system_bugs || 0) + filteredIssues.filter(i => i.issue_type === 'Software').length },
+    { name: 'System Bugs', value: (currentMonthlyEntry?.system_bugs || 0) + filteredIssues.filter(i => i.issue_type === 'System Bugs').length },
     { name: 'Device Issues', value: (currentMonthlyEntry?.device_issues || 0) + filteredIssues.filter(i => i.issue_type === 'Device').length },
-    { name: 'Awareness', value: (currentMonthlyEntry?.awareness || 0) + filteredIssues.filter(i => i.issue_type === 'Awareness').length },
-    { name: 'Help requests', value: (currentMonthlyEntry?.help_requests || 0) + filteredIssues.filter(i => i.issue_type === 'Help Request').length },
+    { name: 'Awerness', value: (currentMonthlyEntry?.awareness || 0) + filteredIssues.filter(i => i.issue_type === 'Awerness').length },
+    { name: 'Help Request', value: (currentMonthlyEntry?.help_requests || 0) + filteredIssues.filter(i => i.issue_type === 'Help Request').length },
   ].filter(d => d.value > 0);
 
   const statusData = ['Open', 'Close', 'Pending', 'In Progress', 'Done'].map(status => ({

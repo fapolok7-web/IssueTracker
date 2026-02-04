@@ -47,12 +47,20 @@ create table if not exists system_downtime (
 
 -- Insert Default Settings (Only if empty)
 insert into settings (category, name)
-select 'issue_type', 'Software'
-where not exists (select 1 from settings where category = 'issue_type');
+select 'issue_type', 'System Bugs'
+where not exists (select 1 from settings where category = 'issue_type' and name = 'System Bugs');
 
 insert into settings (category, name)
 select 'issue_type', 'Device'
 where not exists (select 1 from settings where category = 'issue_type' and name = 'Device');
+
+insert into settings (category, name)
+select 'issue_type', 'Awerness'
+where not exists (select 1 from settings where category = 'issue_type' and name = 'Awerness');
+
+insert into settings (category, name)
+select 'issue_type', 'Help Request'
+where not exists (select 1 from settings where category = 'issue_type' and name = 'Help Request');
 
 insert into settings (category, name)
 select 'priority', 'Low'
