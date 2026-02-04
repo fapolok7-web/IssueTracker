@@ -7,6 +7,7 @@ import { CheckCircle, AlertCircle } from 'lucide-react';
 const IssueEntry: React.FC = () => {
   const [formData, setFormData] = useState({
     client_name: '',
+    issue_date: new Date().toISOString().split('T')[0],
     issue_type: '',
     priority: '',
     status: 'Open',
@@ -140,6 +141,16 @@ const IssueEntry: React.FC = () => {
               >
                 {options.priorities.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
               </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Issue Date *</label>
+              <input
+                type="date"
+                value={formData.issue_date}
+                onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
+              />
             </div>
 
             <div className="space-y-2">

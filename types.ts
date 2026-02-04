@@ -14,6 +14,7 @@ export interface SettingItem {
 export interface Issue {
   id: string;
   client_name: string;
+  issue_date: string;
   issue_type: IssueType;
   priority: Priority;
   status: Status;
@@ -44,12 +45,12 @@ export interface SystemDowntime {
   created_at: string;
 }
 
-export type ViewType = 
-  | 'Dashboard' 
-  | 'IssueEntry' 
-  | 'IssueReports' 
-  | 'MonthlyEntry' 
-  | 'MonthlyReports' 
-  | 'DowntimeEntry' 
+export type ViewType =
+  | 'Dashboard'
+  | 'IssueEntry'
+  | 'IssueReports'
+  | 'MonthlyEntry'
+  | 'MonthlyReports'
+  | 'DowntimeEntry'
   | 'DowntimeReports'
   | 'Settings';

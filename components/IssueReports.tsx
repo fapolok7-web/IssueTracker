@@ -82,11 +82,11 @@ const IssueReports: React.FC = () => {
   const currentIssues = filteredIssues.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const exportCSV = () => {
-    const headers = ['ID', 'Client', 'Type', 'Priority', 'Status', 'Assigned', 'Date'];
+    const headers = ['Date', 'Client', 'Details', 'Type', 'Priority', 'Status', 'Assigned'];
     const rows = filteredIssues.map(i => [
-      i.id, i.client_name, i.issue_type, i.priority, i.status, i.assigned_person, new Date(i.created_at).toLocaleDateString()
+      i.issue_date, i.client_name, i.issue_details.replace(/,/g, ' '), i.issue_type, i.priority, i.status, i.assigned_person
     ]);
-    const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].map(e => e.join(",")).join("\n");
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers, ...rows].map(e => e.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -94,6 +94,60 @@ const IssueReports: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const downloadSampleCSV = () => {
+    const headers = ['Date', 'Client', 'Details', 'Type', 'Priority', 'Status', 'Assigned'];
+    const sampleRow = [new Date().toISOString().split('T')[0], 'Sample Client', 'Sample issue details here', 'Software', 'Medium', 'Open', 'Fuad'];
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers, sampleRow].map(e => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "sample_issue_report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n');
+      const issuesToSave: any[] = [];
+
+      // Skip header row
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const [date, client, details, type, priority, status, assigned] = lines[i].split(',');
+        if (client && details) {
+          issuesToSave.push({
+            issue_date: date?.trim() || new Date().toISOString().split('T')[0],
+            client_name: client.trim(),
+            issue_details: details.trim(),
+            issue_type: type?.trim() || options.issueTypes[0]?.name || 'Software',
+            priority: priority?.trim() || options.priorities[0]?.name || 'Medium',
+            status: status?.trim() || options.statuses[0]?.name || 'Open',
+            assigned_person: assigned?.trim() || options.assignedPersons[0]?.name || 'Fuad',
+          });
+        }
+      }
+
+      if (issuesToSave.length > 0) {
+        try {
+          await dbService.bulkSaveIssues(issuesToSave);
+          alert(`Successfully uploaded ${issuesToSave.length} issues!`);
+          loadIssues();
+        } catch (err) {
+          console.error(err);
+          alert('Failed to upload issues. Please check the CSV format.');
+        }
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
@@ -132,6 +186,20 @@ const IssueReports: React.FC = () => {
             <Download size={16} />
             Export
           </button>
+
+          <button
+            onClick={downloadSampleCSV}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-sm font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
+          >
+            <Download size={16} />
+            Sample
+          </button>
+
+          <label className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-xl text-sm font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors cursor-pointer text-center">
+            <Download size={16} className="rotate-180" />
+            Upload
+            <input type="file" accept=".csv" onChange={handleFileUpload} className="hidden" />
+          </label>
         </div>
       </div>
 
@@ -141,6 +209,7 @@ const IssueReports: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Client</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Details</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Type</th>
@@ -153,6 +222,9 @@ const IssueReports: React.FC = () => {
             <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
               {currentIssues.length > 0 ? currentIssues.map(issue => (
                 <tr key={issue.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                  <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 font-medium">
+                    {issue.issue_date || new Date(issue.created_at).toLocaleDateString()}
+                  </td>
                   <td className="px-6 py-4">
                     <div className="font-semibold text-slate-900 dark:text-white text-sm">{issue.client_name}</div>
                   </td>

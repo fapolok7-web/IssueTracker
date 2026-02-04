@@ -112,6 +112,13 @@ export const dbService = {
     if (error) throw error;
   },
 
+  async bulkSaveIssues(issues: Omit<Issue, 'id' | 'created_at' | 'updated_at'>[]): Promise<void> {
+    const { error } = await supabase
+      .from('issues')
+      .insert(issues);
+    if (error) throw error;
+  },
+
   // Monthly Entries
   async getMonthlyEntries(): Promise<MonthlyEntry[]> {
     const { data, error } = await supabase
