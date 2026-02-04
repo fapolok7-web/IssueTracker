@@ -111,10 +111,10 @@ const IssueEntry: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Client Name *</label>
-              <input 
+              <input
                 type="text"
                 value={formData.client_name}
-                onChange={(e) => setFormData({...formData, client_name: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
                 placeholder="e.g. Acme Corp"
                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
               />
@@ -122,9 +122,9 @@ const IssueEntry: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Issue Type *</label>
-              <select 
+              <select
                 value={formData.issue_type}
-                onChange={(e) => setFormData({...formData, issue_type: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, issue_type: e.target.value })}
                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
               >
                 {options.issueTypes.map(t => <option key={t.id} value={t.name}>{t.name}</option>)}
@@ -133,9 +133,9 @@ const IssueEntry: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Priority *</label>
-              <select 
+              <select
                 value={formData.priority}
-                onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
               >
                 {options.priorities.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
@@ -144,28 +144,39 @@ const IssueEntry: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Assigned To *</label>
-              <select 
+              <select
                 value={formData.assigned_person}
-                onChange={(e) => setFormData({...formData, assigned_person: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, assigned_person: e.target.value })}
                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
               >
                 {options.assignedPersons.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Status *</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
+              >
+                {options.statuses.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
               </select>
             </div>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Issue Details *</label>
-            <textarea 
+            <textarea
               rows={4}
               value={formData.issue_details}
-              onChange={(e) => setFormData({...formData, issue_details: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, issue_details: e.target.value })}
               placeholder="Provide a thorough description of the issue..."
               className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white resize-none"
             />
           </div>
 
-          <button 
+          <button
             type="submit"
             disabled={isLoading}
             className="w-full py-4 gradient-bg text-white font-bold rounded-xl shadow-lg hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"

@@ -68,9 +68,9 @@ const IssueReports: React.FC = () => {
   };
 
   const filteredIssues = issues.filter(issue => {
-    const matchesSearch = issue.client_name.toLowerCase().includes(search.toLowerCase()) || 
-                          issue.issue_details.toLowerCase().includes(search.toLowerCase());
-    
+    const matchesSearch = issue.client_name.toLowerCase().includes(search.toLowerCase()) ||
+      issue.issue_details.toLowerCase().includes(search.toLowerCase());
+
     const issueDate = new Date(issue.created_at).getTime();
     const matchesFromDate = fromDate ? issueDate >= new Date(fromDate).getTime() : true;
     const matchesToDate = toDate ? issueDate <= new Date(toDate).getTime() + 86400000 : true;
@@ -102,7 +102,7 @@ const IssueReports: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <input 
+          <input
             type="text"
             placeholder="Search by client or details..."
             value={search}
@@ -110,22 +110,22 @@ const IssueReports: React.FC = () => {
             className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white text-sm"
           />
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <input 
+          <input
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
             className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white"
           />
           <span className="text-slate-400">to</span>
-          <input 
+          <input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
             className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white"
           />
-          <button 
+          <button
             onClick={exportCSV}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl text-sm font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors"
           >
@@ -142,6 +142,7 @@ const IssueReports: React.FC = () => {
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Client</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Details</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Type</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Priority</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
@@ -154,6 +155,8 @@ const IssueReports: React.FC = () => {
                 <tr key={issue.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                   <td className="px-6 py-4">
                     <div className="font-semibold text-slate-900 dark:text-white text-sm">{issue.client_name}</div>
+                  </td>
+                  <td className="px-6 py-4">
                     <div className="text-xs text-slate-400 truncate max-w-[200px]">{issue.issue_details}</div>
                   </td>
                   <td className="px-6 py-4">
@@ -174,13 +177,13 @@ const IssueReports: React.FC = () => {
                   <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-400">{issue.assigned_person}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button 
+                      <button
                         onClick={() => setEditingIssue(issue)}
                         className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
                       >
                         <Edit2 size={16} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDelete(issue.id)}
                         className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
                       >
@@ -203,9 +206,9 @@ const IssueReports: React.FC = () => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span className="text-sm text-slate-500">Showing {(currentPage-1)*itemsPerPage+1} to {Math.min(currentPage*itemsPerPage, filteredIssues.length)} of {filteredIssues.length} issues</span>
+            <span className="text-sm text-slate-500">Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredIssues.length)} of {filteredIssues.length} issues</span>
             <div className="flex items-center gap-2">
-              <button 
+              <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg disabled:opacity-30 dark:text-white"
@@ -213,7 +216,7 @@ const IssueReports: React.FC = () => {
                 <ChevronLeft size={16} />
               </button>
               <span className="text-sm font-bold px-2 dark:text-white">{currentPage} / {totalPages}</span>
-              <button 
+              <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
                 className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg disabled:opacity-30 dark:text-white"
@@ -239,18 +242,18 @@ const IssueReports: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">Client Name</label>
-                  <input 
+                  <input
                     type="text"
                     value={editingIssue.client_name}
-                    onChange={(e) => setEditingIssue({...editingIssue, client_name: e.target.value})}
+                    onChange={(e) => setEditingIssue({ ...editingIssue, client_name: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">Type</label>
-                  <select 
+                  <select
                     value={editingIssue.issue_type}
-                    onChange={(e) => setEditingIssue({...editingIssue, issue_type: e.target.value})}
+                    onChange={(e) => setEditingIssue({ ...editingIssue, issue_type: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
                   >
                     {options.issueTypes.map(t => <option key={t.id} value={t.name}>{t.name}</option>)}
@@ -258,9 +261,9 @@ const IssueReports: React.FC = () => {
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">Priority</label>
-                  <select 
+                  <select
                     value={editingIssue.priority}
-                    onChange={(e) => setEditingIssue({...editingIssue, priority: e.target.value})}
+                    onChange={(e) => setEditingIssue({ ...editingIssue, priority: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
                   >
                     {options.priorities.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
@@ -268,9 +271,9 @@ const IssueReports: React.FC = () => {
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase">Status</label>
-                  <select 
+                  <select
                     value={editingIssue.status}
-                    onChange={(e) => setEditingIssue({...editingIssue, status: e.target.value})}
+                    onChange={(e) => setEditingIssue({ ...editingIssue, status: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
                   >
                     {options.statuses.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
@@ -279,10 +282,10 @@ const IssueReports: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase">Details</label>
-                <textarea 
+                <textarea
                   rows={4}
                   value={editingIssue.issue_details}
-                  onChange={(e) => setEditingIssue({...editingIssue, issue_details: e.target.value})}
+                  onChange={(e) => setEditingIssue({ ...editingIssue, issue_details: e.target.value })}
                   className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white resize-none"
                 />
               </div>
