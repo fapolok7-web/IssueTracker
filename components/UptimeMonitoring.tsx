@@ -323,11 +323,27 @@ const UptimeMonitoring: React.FC = () => {
                             </div>
                             <div className="w-full h-[400px] bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden relative">
                                 {isMonitoring ? (
-                                    <iframe
-                                        src={settings?.target_url}
-                                        className="w-full h-full border-none bg-white"
-                                        title="Website Preview"
-                                    />
+                                    <>
+                                        <iframe
+                                            src={settings?.target_url}
+                                            className="w-full h-full border-none bg-white"
+                                            title="Website Preview"
+                                        />
+                                        <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
+                                            <a
+                                                href={settings?.target_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg backdrop-blur-sm transition-all flex items-center gap-2"
+                                            >
+                                                <Globe size={14} />
+                                                Open Website
+                                            </a>
+                                            <p className="text-[10px] text-slate-500 bg-black/50 px-2 py-1 rounded backdrop-blur-sm">
+                                                Note: Some sites block iframe previews for security (X-Frame-Options).
+                                            </p>
+                                        </div>
+                                    </>
                                 ) : (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-4">
                                         <div className="w-16 h-16 rounded-full bg-slate-500/10 flex items-center justify-center">
