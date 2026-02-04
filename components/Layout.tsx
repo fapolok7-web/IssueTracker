@@ -62,14 +62,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center text-white shadow-lg">
-              <ShieldCheck size={24} />
-            </div>
-            <div>
-              <h1 className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">Issue Tracker</h1>
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">INOVACE</span>
-            </div>
+          <div className="p-6">
+            <h1 className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">Issue Tracker</h1>
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-widest leading-none">INOVACE</span>
           </div>
 
           {/* Navigation */}
@@ -142,13 +137,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-medium text-slate-600 dark:text-slate-300">System Online</span>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
-              <img src="https://picsum.photos/seed/user/100" alt="Avatar" />
-            </div>
+            {/* Removed System Online and Avatar */}
           </div>
         </header>
 

@@ -14,7 +14,9 @@ import {
   Activity,
   ArrowUpRight,
   ArrowDownRight,
-  ChevronDown
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import { Issue, MonthlyEntry, SystemDowntime } from '../types';
@@ -28,6 +30,10 @@ const Dashboard: React.FC = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
+  const [frequentPage, setFrequentPage] = useState(1);
+  const FREQUENT_PER_PAGE = 10;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +52,14 @@ const Dashboard: React.FC = () => {
   // Filter and process data
   const filteredIssues = issues.filter(issue => {
     const dateToCheck = issue.issue_date || issue.created_at;
-    return dateToCheck && dateToCheck.startsWith(selectedMonth);
+    if (!dateToCheck) return false;
+
+    // Date range filter takes precedence if both set
+    if (fromDate && toDate) {
+      return dateToCheck >= fromDate && dateToCheck <= toDate;
+    }
+
+    return dateToCheck.startsWith(selectedMonth);
   });
 
   const currentMonthlyEntry = monthlyEntries.find(e => e.month === selectedMonth);
@@ -68,9 +81,15 @@ const Dashboard: React.FC = () => {
   }, {} as Record<string, number>);
 
   // Fixed type casting for Object.entries to resolve 'unknown' operator issues
-  const frequentCompanies = Object.entries(companyCounts)
+  const allFrequentCompanies = Object.entries(companyCounts)
     .filter(([, count]) => (count as number) >= 2)
     .sort((a, b) => (b[1] as number) - (a[1] as number));
+
+  const totalFrequentPages = Math.ceil(allFrequentCompanies.length / FREQUENT_PER_PAGE);
+  const frequentCompanies = allFrequentCompanies.slice(
+    (frequentPage - 1) * FREQUENT_PER_PAGE,
+    frequentPage * FREQUENT_PER_PAGE
+  );
 
   // Chart Data
   const issueTypeData = [
@@ -101,24 +120,45 @@ const Dashboard: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Performance Overview</h1>
           <p className="text-slate-500 dark:text-slate-400">Track and analyze system health and issues</p>
         </div>
-        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <span className="text-xs font-bold text-slate-400 pl-2 uppercase">Period</span>
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="bg-transparent text-sm font-semibold outline-none pr-2 cursor-pointer text-indigo-600"
-          >
-            {Array.from({ length: 12 }, (_, i) => {
-              const d = new Date();
-              d.setMonth(d.getMonth() - i);
-              const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-              return (
-                <option key={val} value={val}>
-                  {d.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                </option>
-              );
-            })}
-          </select>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <span className="text-xs font-bold text-slate-400 pl-2 uppercase">From</span>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="bg-transparent text-sm font-semibold outline-none pr-2 cursor-pointer text-indigo-600 dark:text-indigo-400"
+            />
+            <span className="text-xs font-bold text-slate-400 uppercase">To</span>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="bg-transparent text-sm font-semibold outline-none pr-2 cursor-pointer text-indigo-600 dark:text-indigo-400"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <span className="text-xs font-bold text-slate-400 pl-2 uppercase">Select Month</span>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-transparent text-sm font-semibold outline-none pr-2 cursor-pointer text-indigo-600"
+            >
+              {Array.from({ length: 12 }, (_, i) => {
+                const month = String(i + 1).padStart(2, '0');
+                const val = `2026-${month}`;
+                const date = new Date(2026, i, 1);
+                const isFuture = date > new Date();
+
+                return (
+                  <option key={val} value={val} disabled={isFuture}>
+                    {date.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -144,18 +184,44 @@ const Dashboard: React.FC = () => {
             <span className="text-[10px] px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full font-bold uppercase">Critical</span>
           </div>
           <div className="space-y-4">
-            {frequentCompanies.length > 0 ? frequentCompanies.map(([name, count], i) => (
-              <div key={name} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center text-xs font-bold text-slate-400">#{i + 1}</div>
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{name}</span>
-                </div>
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold">
-                  <ArrowUpRight size={14} />
-                  {count} Issues
-                </div>
-              </div>
-            )) : (
+            {frequentCompanies.length > 0 ? (
+              <>
+                {frequentCompanies.map(([name, count], i) => (
+                  <div key={name} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center text-xs font-bold text-slate-400">#{(frequentPage - 1) * FREQUENT_PER_PAGE + i + 1}</div>
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{name}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold">
+                      <ArrowUpRight size={14} />
+                      {count} Issues
+                    </div>
+                  </div>
+                ))}
+
+                {totalFrequentPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
+                    <button
+                      onClick={() => setFrequentPage(p => Math.max(1, p - 1))}
+                      disabled={frequentPage === 1}
+                      className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg disabled:opacity-30 dark:text-white"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <span className="text-xs font-bold text-slate-500">
+                      {frequentPage} / {totalFrequentPages}
+                    </span>
+                    <button
+                      onClick={() => setFrequentPage(p => Math.min(totalFrequentPages, p + 1))}
+                      disabled={frequentPage === totalFrequentPages}
+                      className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg disabled:opacity-30 dark:text-white"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
               <div className="py-12 text-center text-slate-400">
                 <p className="text-sm">No frequent reports this month</p>
               </div>
