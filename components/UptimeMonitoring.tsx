@@ -11,7 +11,8 @@ import {
     Zap,
     LayoutDashboard,
     Signal,
-    Globe
+    Globe,
+    RefreshCw
 } from 'lucide-react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
@@ -321,35 +322,56 @@ const UptimeMonitoring: React.FC = () => {
                                 </div>
                                 <h3 className="font-bold text-lg text-white">Live Preview</h3>
                             </div>
-                            <div className="w-full h-[400px] bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden relative">
-                                {isMonitoring ? (
-                                    <>
-                                        <iframe
-                                            src={settings?.target_url}
-                                            className="w-full h-full border-none bg-white"
-                                            title="Website Preview"
-                                        />
-                                        <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
-                                            <a
-                                                href={settings?.target_url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg backdrop-blur-sm transition-all flex items-center gap-2"
-                                            >
-                                                <Globe size={14} />
-                                                Open Website
-                                            </a>
-                                            <p className="text-[10px] text-slate-500 bg-black/50 px-2 py-1 rounded backdrop-blur-sm">
-                                                Note: Some sites block iframe previews for security (X-Frame-Options).
-                                            </p>
+                            <div className="w-full h-[500px] bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden relative shadow-inner">
+                                {isMonitoring && settings?.target_url ? (
+                                    <div className="h-full w-full flex flex-col">
+                                        <div className="flex-1 relative">
+                                            <iframe
+                                                src={settings.target_url}
+                                                className="w-full h-full border-none bg-white"
+                                                title="Website Preview"
+                                                onError={(e) => console.error('Iframe load error', e)}
+                                            />
+                                            <div className="absolute inset-0 pointer-events-none border border-white/5 rounded-2xl scale-[1.01]" />
                                         </div>
-                                    </>
+                                        <div className="p-4 bg-[#0a0a0a] border-t border-white/5 flex justify-between items-center">
+                                            <div className="flex items-center gap-4">
+                                                <a
+                                                    href={settings.target_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2"
+                                                >
+                                                    <Globe size={14} />
+                                                    Open in New Tab
+                                                </a>
+                                                <p className="text-[10px] text-slate-500 font-medium">
+                                                    Note: Some sites block embedding for security.
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    // Simple hack to reload iframe
+                                                    const currentUrl = settings.target_url;
+                                                    setSettings({ ...settings, target_url: '' });
+                                                    setTimeout(() => setSettings({ ...settings, target_url: currentUrl }), 10);
+                                                }}
+                                                className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-indigo-400 transition-all"
+                                            >
+                                                <RefreshCw size={14} />
+                                                <span className="text-[10px] font-bold uppercase tracking-widest">Reload Preview</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-4">
-                                        <div className="w-16 h-16 rounded-full bg-slate-500/10 flex items-center justify-center">
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-4 bg-[#050505]">
+                                        <div className="w-16 h-16 rounded-full bg-slate-500/5 flex items-center justify-center border border-white/5">
                                             <Play size={24} className="ml-1 opacity-20" />
                                         </div>
-                                        <p className="text-sm font-medium">Click "Start" to see live preview</p>
+                                        <div className="text-center">
+                                            <p className="text-sm font-bold text-slate-400">Preview Standby</p>
+                                            <p className="text-[11px] text-slate-600 mt-1">Click "Start" to initialize monitoring and preview</p>
+                                        </div>
                                     </div>
                                 )}
                             </div>
