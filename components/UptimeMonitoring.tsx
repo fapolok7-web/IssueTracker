@@ -10,7 +10,8 @@ import {
     Edit2,
     Zap,
     LayoutDashboard,
-    Signal
+    Signal,
+    Globe
 } from 'lucide-react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
@@ -310,6 +311,32 @@ const UptimeMonitoring: React.FC = () => {
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
+                        </div>
+
+                        {/* Website Preview Iframe */}
+                        <div className="mt-8 border-t border-white/5 pt-8">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                                    <Globe size={18} />
+                                </div>
+                                <h3 className="font-bold text-lg text-white">Live Preview</h3>
+                            </div>
+                            <div className="w-full h-[400px] bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden relative">
+                                {isMonitoring ? (
+                                    <iframe
+                                        src={settings?.target_url}
+                                        className="w-full h-full border-none bg-white"
+                                        title="Website Preview"
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-4">
+                                        <div className="w-16 h-16 rounded-full bg-slate-500/10 flex items-center justify-center">
+                                            <Play size={24} className="ml-1 opacity-20" />
+                                        </div>
+                                        <p className="text-sm font-medium">Click "Start" to see live preview</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
