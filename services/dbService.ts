@@ -5,6 +5,8 @@ import { Issue, MonthlyEntry, SystemDowntime, SettingItem } from '../types';
 const INITIAL_SETTINGS: Omit<SettingItem, 'id' | 'created_at'>[] = [
   { category: 'issue_type', name: 'Software' },
   { category: 'issue_type', name: 'Device' },
+  { category: 'issue_type', name: 'Awareness' },
+  { category: 'issue_type', name: 'Help Request' },
   { category: 'priority', name: 'Low' },
   { category: 'priority', name: 'Medium' },
   { category: 'priority', name: 'High' },
@@ -109,6 +111,14 @@ export const dbService = {
       .from('issues')
       .delete()
       .eq('id', id);
+    if (error) throw error;
+  },
+
+  async bulkDeleteIssues(ids: string[]): Promise<void> {
+    const { error } = await supabase
+      .from('issues')
+      .delete()
+      .in('id', ids);
     if (error) throw error;
   },
 

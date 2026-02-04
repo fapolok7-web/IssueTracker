@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { 
-  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, 
+import {
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
   LineChart, Line, AreaChart, Area
 } from 'recharts';
-import { 
-  AlertCircle, 
-  Bug, 
-  Smartphone, 
-  Lightbulb, 
-  HelpCircle, 
+import {
+  AlertCircle,
+  Bug,
+  Smartphone,
+  Lightbulb,
+  HelpCircle,
   Activity,
   ArrowUpRight,
   ArrowDownRight,
@@ -44,16 +44,20 @@ const Dashboard: React.FC = () => {
   }, []);
 
   // Filter and process data
-  const filteredIssues = issues.filter(issue => issue.created_at.startsWith(selectedMonth));
+  const filteredIssues = issues.filter(issue => {
+    const dateToCheck = issue.issue_date || issue.created_at;
+    return dateToCheck && dateToCheck.startsWith(selectedMonth);
+  });
+
   const currentMonthlyEntry = monthlyEntries.find(e => e.month === selectedMonth);
 
   // Metrics
   const stats = [
-    { label: 'Total Issues', value: currentMonthlyEntry?.total_issues || filteredIssues.length, icon: AlertCircle, color: 'text-indigo-600', bg: 'bg-indigo-100 dark:bg-indigo-900/20' },
-    { label: 'System Bugs', value: currentMonthlyEntry?.system_bugs || filteredIssues.filter(i => i.issue_details.toLowerCase().includes('bug')).length, icon: Bug, color: 'text-rose-600', bg: 'bg-rose-100 dark:bg-rose-900/20' },
-    { label: 'Device Issues', value: currentMonthlyEntry?.device_issues || filteredIssues.filter(i => i.issue_type === 'Device').length, icon: Smartphone, color: 'text-amber-600', bg: 'bg-amber-100 dark:bg-amber-900/20' },
-    { label: 'Awareness', value: currentMonthlyEntry?.awareness || 0, icon: Lightbulb, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/20' },
-    { label: 'Help Requests', value: currentMonthlyEntry?.help_requests || 0, icon: HelpCircle, color: 'text-sky-600', bg: 'bg-sky-100 dark:bg-sky-900/20' },
+    { label: 'Total Issues', value: (currentMonthlyEntry?.total_issues || 0) + filteredIssues.length, icon: AlertCircle, color: 'text-indigo-600', bg: 'bg-indigo-100 dark:bg-indigo-900/20' },
+    { label: 'System bugs', value: (currentMonthlyEntry?.system_bugs || 0) + filteredIssues.filter(i => i.issue_type === 'Software').length, icon: Bug, color: 'text-rose-600', bg: 'bg-rose-100 dark:bg-rose-900/20' },
+    { label: 'Device Issues', value: (currentMonthlyEntry?.device_issues || 0) + filteredIssues.filter(i => i.issue_type === 'Device').length, icon: Smartphone, color: 'text-amber-600', bg: 'bg-amber-100 dark:bg-amber-900/20' },
+    { label: 'Awareness', value: (currentMonthlyEntry?.awareness || 0) + filteredIssues.filter(i => i.issue_type === 'Awareness').length, icon: Lightbulb, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/20' },
+    { label: 'Help requests', value: (currentMonthlyEntry?.help_requests || 0) + filteredIssues.filter(i => i.issue_type === 'Help Request').length, icon: HelpCircle, color: 'text-sky-600', bg: 'bg-sky-100 dark:bg-sky-900/20' },
     { label: 'System Downtime', value: `${(downtime.filter(d => d.date.startsWith(selectedMonth)).reduce((acc, d) => acc + d.duration_minutes, 0) / 60).toFixed(1)}h`, icon: Activity, color: 'text-fuchsia-600', bg: 'bg-fuchsia-100 dark:bg-fuchsia-900/20' },
   ];
 
@@ -63,17 +67,17 @@ const Dashboard: React.FC = () => {
     return acc;
   }, {} as Record<string, number>);
 
-  // Fixed type casting for Object.entries to resolve 'unknown' operator issues on line 67 and 68
+  // Fixed type casting for Object.entries to resolve 'unknown' operator issues
   const frequentCompanies = Object.entries(companyCounts)
     .filter(([, count]) => (count as number) >= 2)
     .sort((a, b) => (b[1] as number) - (a[1] as number));
 
   // Chart Data
   const issueTypeData = [
-    { name: 'System Bug', value: currentMonthlyEntry?.system_bugs || filteredIssues.filter(i => i.issue_details.toLowerCase().includes('bug')).length },
-    { name: 'Device Issue', value: currentMonthlyEntry?.device_issues || filteredIssues.filter(i => i.issue_type === 'Device').length },
-    { name: 'Awareness', value: currentMonthlyEntry?.awareness || 0 },
-    { name: 'Help Request', value: currentMonthlyEntry?.help_requests || 0 },
+    { name: 'System bugs', value: (currentMonthlyEntry?.system_bugs || 0) + filteredIssues.filter(i => i.issue_type === 'Software').length },
+    { name: 'Device Issues', value: (currentMonthlyEntry?.device_issues || 0) + filteredIssues.filter(i => i.issue_type === 'Device').length },
+    { name: 'Awareness', value: (currentMonthlyEntry?.awareness || 0) + filteredIssues.filter(i => i.issue_type === 'Awareness').length },
+    { name: 'Help requests', value: (currentMonthlyEntry?.help_requests || 0) + filteredIssues.filter(i => i.issue_type === 'Help Request').length },
   ].filter(d => d.value > 0);
 
   const statusData = ['Open', 'Close', 'Pending', 'In Progress', 'Done'].map(status => ({
@@ -99,7 +103,7 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <span className="text-xs font-bold text-slate-400 pl-2 uppercase">Period</span>
-          <select 
+          <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
             className="bg-transparent text-sm font-semibold outline-none pr-2 cursor-pointer text-indigo-600"
@@ -143,7 +147,7 @@ const Dashboard: React.FC = () => {
             {frequentCompanies.length > 0 ? frequentCompanies.map(([name, count], i) => (
               <div key={name} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center text-xs font-bold text-slate-400">#{i+1}</div>
+                  <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center text-xs font-bold text-slate-400">#{i + 1}</div>
                   <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{name}</span>
                 </div>
                 <div className="flex items-center gap-1.5 px-2 py-1 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold">
@@ -178,7 +182,7 @@ const Dashboard: React.FC = () => {
                     <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
                   itemStyle={{ color: '#fff' }}
                 />
@@ -197,7 +201,7 @@ const Dashboard: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 600 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 600 }} />
-                <Tooltip 
+                <Tooltip
                   cursor={{ fill: 'rgba(226, 232, 240, 0.4)' }}
                   contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
                 />
@@ -224,27 +228,27 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={downtimeTimeline.length > 0 ? downtimeTimeline : [{date: '01', duration: 0}, {date: '30', duration: 0}]}>
+            <AreaChart data={downtimeTimeline.length > 0 ? downtimeTimeline : [{ date: '01', duration: 0 }, { date: '30', duration: 0 }]}>
               <defs>
                 <linearGradient id="colorDur" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis dataKey="date" axisLine={false} tickLine={false} label={{ value: 'Day of Month', position: 'insideBottom', offset: -5, fontSize: 10 }} />
               <YAxis axisLine={false} tickLine={false} unit="m" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
                 labelFormatter={(label) => `Day: ${label}`}
               />
-              <Area 
-                type="monotone" 
-                dataKey="duration" 
-                stroke="#f43f5e" 
+              <Area
+                type="monotone"
+                dataKey="duration"
+                stroke="#f43f5e"
                 strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorDur)" 
+                fillOpacity={1}
+                fill="url(#colorDur)"
                 animationDuration={1500}
               />
             </AreaChart>
